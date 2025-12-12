@@ -4,6 +4,8 @@ import axios from "axios";
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(express.json());
+
 // Legge le variabili d'ambiente
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -12,6 +14,12 @@ const roomURL = process.env.ROOM_URL;
 // Endpoint principale di test
 app.get("/", (req, res) => {
   res.send("Server B&B attivo 😊");
+});
+
+// Endpoint per notifiche Daily
+app.post("/daily-webhook", (req, res) => {
+  console.log("Evento Daily ricevuto:", req.body);
+  res.sendStatus(200);
 });
 
 // Endpoint per notificare l'host
