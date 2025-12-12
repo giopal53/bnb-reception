@@ -1,50 +1,35 @@
-import express from "express";
-import axios from "axios";
+const express = require("express");
+const axios = require("axios");
 
 const app = express();
-const port = process.env.PORT || 3000;
-
 app.use(express.json());
 
-// ✅ NUOVO ENDPOINT PER WEBHOOK DAILY
-app.post("/daily-webhook", async (req, res) => {
-  const { event, payload } = req.body;
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
+
+async function sendTelegram(text) {
+  await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    chat_id: CHAT_ID,
+    text: text
+  });
+}
+
+app.post("/webhook", async (req, res) => {
+  const data = req.body;
+
+  const event = data.event;
+  const participant = data.participant?.user_name || "Sconosciuto";
 
   if (event === "participant-joined") {
-    try {
-      await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        chat_id: process.env.TELEGRAM_CHAT_ID,
-        text: `🚪 Un ospite è entrato nella stanza!\n👤 ${payload.user_name || "Ospite"}`
-      });
-      console.log("Notifica Telegram inviata");
-    } catch (err) {
-      console.error("Errore Telegram:", err.message);
-    }
+    await sendTelegram(`🚪 ${participant} è entrato nella stanza Daily.co!`);
   }
 
-  res.sendStatus(200);
+  res.json({ status: "ok" });
 });
 
-// Endpoint principale di test
 app.get("/", (req, res) => {
-  res.send("Server B&B attivo 😊");
+  res.send("Bot attivo!");
 });
 
-// Endpoint per notificare l'host manualmente
-app.get("/call-host", async (req, res) => {
-  try {
-    await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      chat_id: process.env.TELEGRAM_CHAT_ID,
-      text: `📞 Un ospite ti sta chiamando dalla reception!\n👉 Entra nella stanza video:\n${process.env.ROOM_URL}`
-    });
-    res.send("Notifica inviata!");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Errore nell'invio della notifica.");
-  }
-});
-
-// Avvio server
-app.listen(port, () => {
-  console.log(`Server B&B attivo sulla porta ${port}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Server avviato sulla porta " + PORT));
