@@ -12,8 +12,8 @@ app.post("/daily-webhook", async (req, res) => {
 
   if (event === "participant-joined") {
     try {
-      await axios.post(`https://api.telegram.org/bot${process.env.8233140543:AAEz3O5dmXzGGXX417l7MLqZXAl-pGfqC7Q}/sendMessage`, {
-        chat_id: process.env.7048201438,
+      await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        chat_id: process.env.TELEGRAM_CHAT_ID,
         text: `🚪 Un ospite è entrato nella stanza!\n👤 ${payload.user_name || "Ospite"}`
       });
       console.log("Notifica Telegram inviata");
@@ -33,8 +33,8 @@ app.get("/", (req, res) => {
 // Endpoint per notificare l'host manualmente
 app.get("/call-host", async (req, res) => {
   try {
-    await axios.post(`https://api.telegram.org/bot${process.env.8233140543:AAEz3O5dmXzGGXX417l7MLqZXAl-pGfqC7Q}/sendMessage`, {
-      chat_id: process.env.7048201438,
+    await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      chat_id: process.env.TELEGRAM_CHAT_ID,
       text: `📞 Un ospite ti sta chiamando dalla reception!\n👉 Entra nella stanza video:\n${process.env.ROOM_URL}`
     });
     res.send("Notifica inviata!");
