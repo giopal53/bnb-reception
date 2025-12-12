@@ -13,6 +13,21 @@ async function sendTelegram(text) {
     text: text
   });
 }
+app.post("/daily-webhook", (req, res) => {
+  // rispondi subito 200 a Daily
+  res.status(200).json({ ok: true });
+
+  console.log("DAILY WEBHOOK:", JSON.stringify(req.body, null, 2));
+
+  const type = req.body?.type;        // es: "participant.joined"
+  const payload = req.body?.payload || {};
+
+  if (type === "participant.joined") {
+    const name = payload.user_name || "Sconosciuto";
+    sendTelegram(`🚪 ${name} è entrato nella stanza!`).catch(console.error);
+  }
+});
+
 app.post("/webhook", async (req, res) => {
   console.log("WEBHOOK RICEVUTO:", JSON.stringify(req.body));
   res.status(200).json({ ok: true });
